@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator &amp; Koreksi Masa Kerja Golongan PNS</title>
+<meta name="description" content="Menelusuri riwayat pangkat sejak CPNS untuk menghitung Masa Kerja Golongan (MKG) yang seharusnya di setiap SK Kenaikan Pangkat, dan membandingkannya dengan MKG yang tercantum untuk menemukan kesalahan SK sebelumnya.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="sheet">
+
+  <header class="letterhead">
+    <div class="letterhead__line">Kepegawaian Aparatur Sipil Negara</div>
+    <h1 class="letterhead__title">Koreksi Masa Kerja Golongan</h1>
+    <p class="letterhead__sub">Menelusuri riwayat pangkat sejak TMT CPNS, menghitung ulang Masa Kerja Golongan (MKG) yang seharusnya pada setiap SK Kenaikan Pangkat menurut sistem gaji segaris, dan membandingkannya dengan MKG yang tercantum &mdash; untuk menemukan SK yang keliru sebelum kesalahan itu menjalar ke SK berikutnya.</p>
+  </header>
+
+  <section class="block">
+    <h2 class="block__title">01&nbsp; Pengangkatan CPNS</h2>
+    <p class="block__lede">Titik awal riwayat. Bila saat pengangkatan CPNS sudah ada masa kerja yang diperhitungkan (dari pengalaman kerja sebelumnya sesuai SK CPNS), isikan di bawah &mdash; bila tidak ada, biarkan 0.</p>
+
+    <div class="ledger">
+      <div class="ledger__row">
+        <label for="cpns-tmt">TMT CPNS</label>
+        <input type="date" id="cpns-tmt" required>
+      </div>
+      <div class="ledger__row">
+        <label for="cpns-golongan">Golongan/ruang awal</label>
+        <select id="cpns-golongan" required></select>
+      </div>
+      <div class="ledger__row ledger__row--split">
+        <label>Masa kerja diperhitungkan saat CPNS</label>
+        <div class="ledger__inline">
+          <div class="field-unit"><input type="number" id="cpns-thn" min="0" value="0"><span>tahun</span></div>
+          <div class="field-unit"><input type="number" id="cpns-bln" min="0" max="11" value="0"><span>bulan</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="block__title">02&nbsp; Riwayat SK Kenaikan Pangkat</h2>
+    <p class="block__lede">Tambahkan setiap SK Kenaikan Pangkat secara berurutan dari yang paling lama. Kolom &ldquo;MKG tercantum dalam SK&rdquo; bersifat opsional &mdash; isi bila ingin dibandingkan dengan hasil hitung; kosongkan bila tidak punya datanya.</p>
+
+    <div id="riwayat-container" class="riwayat"></div>
+
+    <button type="button" class="btn btn--ghost" id="btn-tambah-sk">+ Tambah SK Kenaikan Pangkat</button>
+  </section>
+
+  <section class="block">
+    <h2 class="block__title">03&nbsp; Tanggal acuan</h2>
+    <p class="block__lede">Untuk menghitung MKG dan Masa Kerja Keseluruhan (MKS) yang berjalan pada golongan/ruang terakhir.</p>
+    <div class="ledger ledger--tight">
+      <div class="ledger__row">
+        <label for="tanggal-acuan">Dihitung sampai tanggal</label>
+        <input type="date" id="tanggal-acuan" required>
+      </div>
+    </div>
+    <button type="button" class="btn" id="btn-hitung">Hitung &amp; periksa riwayat</button>
+  </section>
+
+  <section class="block" id="hasil-section" hidden>
+    <h2 class="block__title">Hasil pemeriksaan</h2>
+
+    <div class="table-wrap">
+      <table class="tabel-hasil">
+        <thead>
+          <tr>
+            <th>Tahap</th>
+            <th>TMT</th>
+            <th>Golongan</th>
+            <th>MKG seharusnya</th>
+            <th>MKG tercantum SK</th>
+            <th>Selisih</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tabel-hasil-body"></tbody>
+      </table>
+    </div>
+
+    <div class="ringkasan">
+      <div class="ringkasan__item">
+        <p class="ringkasan__label">MKG berjalan saat ini</p>
+        <p class="ringkasan__value" id="ringkasan-mkg">&mdash;</p>
+        <p class="ringkasan__note" id="ringkasan-mkg-note"></p>
+      </div>
+      <div class="ringkasan__item">
+        <p class="ringkasan__label">Masa Kerja Keseluruhan (MKS)</p>
+        <p class="ringkasan__value" id="ringkasan-mks">&mdash;</p>
+        <p class="ringkasan__note">Dihitung lurus dari TMT CPNS, tidak dipengaruhi pengurangan segaris.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="foot__rule"></div>
+    <p><strong>Metode.</strong> Berdasarkan PP No. 7 Tahun 1977 tentang Peraturan Gaji Pegawai Negeri Sipil sebagaimana diubah terakhir dengan PP No. 30 Tahun 2015 (sistem gaji segaris). Pada setiap SK Kenaikan Pangkat, MKG dihitung dari waktu yang berjalan sejak TMT SK sebelumnya ditambah MKG pada SK sebelumnya. Bila pangkat baru berpindah rumpun golongan, MKG tersebut dikurangi: I&rarr;II sebesar 6 tahun, II&rarr;III sebesar 5 tahun; pindah rumpun III&rarr;IV tidak dikurangi; kenaikan pangkat reguler di dalam rumpun yang sama tidak dikurangi. Bila hasil pengurangan minus, MKG ditetapkan 0 tahun 0 bulan. Nilai hasil hitung pada satu tahap dipakai sebagai dasar tahap berikutnya (bukan nilai tercantum di SK), sehingga kesalahan pada satu SK tidak ikut menjalar ke perhitungan berikutnya.</p>
+    <p class="foot__disclaimer">Alat bantu hitung ini bersifat referensi internal untuk penelusuran indikasi kesalahan. Koreksi resmi tetap memerlukan verifikasi dan penetapan oleh BKN/instansi Pembina kepegawaian berdasarkan dokumen SK asli.</p>
+  </footer>
+
+</div>
+
+<template id="template-riwayat-row">
+  <div class="riwayat__row" data-row>
+    <div class="riwayat__row-head">
+      <span class="riwayat__row-title" data-row-title>SK Kenaikan Pangkat</span>
+      <button type="button" class="riwayat__remove" data-remove title="Hapus baris ini">Hapus</button>
+    </div>
+    <div class="ledger__row">
+      <label>TMT SK</label>
+      <input type="date" data-field="tmt" required>
+    </div>
+    <div class="ledger__row">
+      <label>Golongan/ruang baru</label>
+      <select data-field="golongan" required></select>
+    </div>
+    <div class="ledger__row ledger__row--split">
+      <label>MKG tercantum dalam SK <span class="opsional">(opsional)</span></label>
+      <div class="ledger__inline">
+        <div class="field-unit"><input type="number" min="0" data-field="thn" placeholder="&mdash;"><span>tahun</span></div>
+        <div class="field-unit"><input type="number" min="0" max="11" data-field="bln" placeholder="&mdash;"><span>bulan</span></div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script src="assets/script.js"></script>
+</body>
+</html>
